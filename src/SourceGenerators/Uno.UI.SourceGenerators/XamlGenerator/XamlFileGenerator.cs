@@ -21,6 +21,7 @@ using Uno.UI.SourceGenerators.XamlGenerator.XamlRedirection;
 using System.Runtime.CompilerServices;
 using Uno.UI.Xaml;
 
+
 namespace Uno.UI.SourceGenerators.XamlGenerator
 {
 	internal partial class XamlFileGenerator
@@ -119,7 +120,6 @@ namespace Uno.UI.SourceGenerators.XamlGenerator
 		private readonly INamedTypeSymbol _setterSymbol;
 		private readonly INamedTypeSymbol _colorSymbol;
 
-		private readonly List<INamedTypeSymbol> _markupExtensionTypes;
 		private readonly List<INamedTypeSymbol> _xamlConversionTypes;
 
 		private readonly bool _isWasm;
@@ -231,7 +231,6 @@ namespace Uno.UI.SourceGenerators.XamlGenerator
 			_androidContentContextSymbol = FindType("Android.Content.Context");
 			_androidViewSymbol = FindType("Android.Views.View");
 
-			_markupExtensionTypes = _metadataHelper.GetAllTypesDerivingFrom(_markupExtensionSymbol).ToList();
 			_xamlConversionTypes = _metadataHelper.GetAllTypesAttributedWith(GetType(XamlConstants.Types.CreateFromStringAttribute)).ToList();
 
 			_isWasm = isWasm;
@@ -759,7 +758,7 @@ namespace Uno.UI.SourceGenerators.XamlGenerator
 			var hasXBindExpressions = CurrentScope.XBindExpressions.Count != 0;
 			var hasResourceExtensions = CurrentScope.Components.Any(HasMarkupExtensionNeedingComponent);
 
-			if (hasXBindExpressions)
+			if (hasXBindExpressions || hasResourceExtensions)
 			{
 				writer.AppendLineInvariant($"Bindings = new {GetBindingsTypeNames(className).bindingsClassName}(this);");
 			}
@@ -823,7 +822,10 @@ namespace Uno.UI.SourceGenerators.XamlGenerator
 
 		private void BuildCompiledBindings(IndentedStringBuilder writer, string className)
 		{
-			if (CurrentScope.XBindExpressions.Count != 0)
+			var hasXBindExpressions = CurrentScope.XBindExpressions.Count != 0;
+			var hasResourceExtensions = CurrentScope.Components.Any(HasMarkupExtensionNeedingComponent);
+
+			if (hasXBindExpressions || hasResourceExtensions)
 			{
 				var (bindingsInterfaceName, bindingsClassName) = GetBindingsTypeNames(className);
 
@@ -1644,7 +1646,10 @@ namespace Uno.UI.SourceGenerators.XamlGenerator
 						// Bindings with ElementName properties needs to be resolved during Loading.
 						|| (o.Type.Name == "Binding" && o.Members.Any(m => m.Member.Name == "ElementName"))
 					)
-				);
+				)
+			|| (
+				objectDefinition.Type.Name == "ElementStub"
+			);
 
 		/// <summary>
 		/// Does this node or any nested nodes have markup extensions?
@@ -1678,19 +1683,29 @@ namespace Uno.UI.SourceGenerators.XamlGenerator
 			return false;
 		}
 
-		private bool IsCustomMarkupExtensionType(XamlType xamlType)
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private INamedTypeSymbol GetMarkupExtensionType(XamlType xamlType)
 		{
 			if (xamlType == null)
 			{
-				return false;
+				return null;
 			}
 
-			// Adjustment for Uno.Xaml parser which returns the namespace in the name
-			var xamlTypeName = xamlType.Name.Contains(':') ? xamlType.Name.Split(':').LastOrDefault() : xamlType.Name;
+			var ns = GetTrimmedNamespace(xamlType.PreferredXamlNamespace); // No MarkupExtensions are defined in the framework, so we expect a user-defined namespace
+			var baseTypeString = $"{ns}.{xamlType.Name}";
+			var findType = FindType(baseTypeString);
+			findType ??= FindType(baseTypeString + "Extension"); // Support shortened syntax
+			if (findType?.Is(_markupExtensionSymbol) ?? false)
+			{
+				return findType;
+			}
 
-			// Determine if the type is a custom markup extension
-			return _markupExtensionTypes.Any(ns => ns.Name.Equals(xamlTypeName, StringComparison.InvariantCulture));
+			return null;
 		}
+
+		private bool IsCustomMarkupExtensionType(XamlType xamlType) =>
+			// Determine if the type is a custom markup extension
+			GetMarkupExtensionType(xamlType) != null;
 
 		private bool IsXamlTypeConverter(INamedTypeSymbol symbol)
 		{
@@ -3604,24 +3619,25 @@ namespace Uno.UI.SourceGenerators.XamlGenerator
 			var markupTypeDef = member
 				.Objects
 				.FirstOrDefault(o => IsCustomMarkupExtensionType(o.Type));
-
+			var markupType = GetMarkupExtensionType(markupTypeDef.Type);
 			// Build a string of all its properties
 			var properties = markupTypeDef
 				.Members
 				.Select(m =>
 				{
-					var resourceName = GetSimpleStaticResourceRetrieval(m);
-
+					var propertyType = markupType.GetAllPropertiesWithName(m.Member.Name)?
+					 .FirstOrDefault()?.Type as INamedTypeSymbol;
+					var resourceName = GetSimpleStaticResourceRetrieval(m, propertyType);
 					var value = resourceName != null
 						? resourceName
-						: BuildLiteralValue(m, owner: member);
+						: BuildLiteralValue(m, propertyType: propertyType, owner: member);
 
 					return "{0} = {1}".InvariantCultureFormat(m.Member.Name, value);
 				})
 				.JoinBy(", ");
 
 			// Get the full globalized namespaces for the custom markup extension and also for IMarkupExtensionOverrides
-			var markupType = GetType(markupTypeDef.Type);
+
 			var markupTypeFullName = GetGlobalizedTypeName(markupType.GetFullName());
 			var xamlMarkupFullName = GetGlobalizedTypeName(XamlConstants.Types.IMarkupExtensionOverrides);
 
@@ -4105,6 +4121,8 @@ namespace Uno.UI.SourceGenerators.XamlGenerator
 					var originalType = propertyType;
 
 					propertyType = propertyType ?? FindPropertyType(member.Member);
+
+
 
 					if (propertyType != null)
 					{

@@ -22,7 +22,7 @@ The XAML editor may be empty when the active editor project is not UWP.
 
 To work around this issue, close all XAML editors, open a C# file and select 'UWP' in the top left drop-down list of the text editor sector. Once selected, re-open the XAML file.
 
-### `x:Name` variable is not available in code-behind
+### `InitializeComponent` or `x:Name` variable is not available in code-behind
 Visual Studio 16.7 and earlier versions [do not refresh the intellisense cache ](https://developercommunity.visualstudio.com/content/problem/588021/the-compile-itemgroup-intellisense-cache-is-not-re.html)properly, causing variables to be incorrectly defined.
 
 To fix this issue, build your project once, close the solution and reopen it.
@@ -66,4 +66,5 @@ Unhandled exception. System.TypeInitializationException: The type initializer fo
 ```
 
 On Windows, you will need to install the [GTK+3 runtime](https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases). **Make sure to restart Visual Studio** for the changes to be used by Visual Studio.
-On Linux, you'll need to follow the [Uno Platform](https://github.com/unoplatform/uno/blob/master/doc/articles/get-started-with-linux.md#setting-up-for-linux) setup instructions.
+On Linux, you'll need to follow the [Uno Platform](get-started-with-linux.md#setting-up-for-linux) setup instructions.
+On macOS, you'll need to follow the [Uno Platform](get-started-with-vsmac.md) setup instructions.

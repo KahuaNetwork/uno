@@ -517,6 +517,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="$(MSBuildThisFileDirectory)Windows_UI_Xaml\FrameworkElementTests\FrameworkElement_Sizes.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="$(MSBuildThisFileDirectory)Windows_UI_Xaml\FrameworkElementTests\FrameworkElement_UnloadedMeasure.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -901,6 +905,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="$(MSBuildThisFileDirectory)Windows_UI_Xaml_Controls\DatePicker\DatePicker_DatePartVisibility.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)Windows_UI_Xaml_Controls\DatePicker\DatePicker_Header.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="$(MSBuildThisFileDirectory)Windows_UI_Xaml_Controls\DropDownButton\DropDownButtonPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -1154,6 +1166,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)Windows_UI_Xaml_Controls\TextBlockControl\SimpleText_MaxLines_Different_Font_Size.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)Windows_UI_Xaml_Controls\TextBlockControl\SimpleText_MaxLines_Multiple_Containers.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -3920,6 +3936,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Windows_UI_Xaml\FrameworkElementTests\FrameworkElement_NativeLayout.xaml.cs">
       <DependentUpon>FrameworkElement_NativeLayout.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Windows_UI_Xaml\FrameworkElementTests\FrameworkElement_Sizes.xaml.cs">
+      <DependentUpon>FrameworkElement_Sizes.xaml</DependentUpon>
+    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Windows_UI_Xaml\FrameworkElementTests\FrameworkElement_UnloadedMeasure.xaml.cs">
       <DependentUpon>FrameworkElement_UnloadedMeasure.xaml</DependentUpon>
     </Compile>
@@ -4140,6 +4159,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)Windows_UI_Xaml_Controls\DatePicker\DatePickerFlyout_Date_Binding.xaml.cs">
       <DependentUpon>DatePickerFlyout_Date_Binding.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Windows_UI_Xaml_Controls\DatePicker\DatePicker_DatePartVisibility.xaml.cs">
+      <DependentUpon>DatePicker_DatePartVisibility.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Windows_UI_Xaml_Controls\DatePicker\DatePicker_Header.xaml.cs">
+      <DependentUpon>DatePicker_Header.xaml</DependentUpon>
+    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Windows_UI_Xaml_Controls\DropDownButton\DropDownButtonPage.xaml.cs">
       <DependentUpon>DropDownButtonPage.xaml</DependentUpon>
     </Compile>
@@ -4323,6 +4348,9 @@
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Windows_UI_Xaml_Controls\TextBlockControl\SimpleText_MaxLines_Different_Font_Size.xaml.cs">
       <DependentUpon>SimpleText_MaxLines_Different_Font_Size.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Windows_UI_Xaml_Controls\TextBlockControl\SimpleText_MaxLines_Multiple_Containers.xaml.cs">
+      <DependentUpon>SimpleText_MaxLines_Multiple_Containers.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Windows_UI_Xaml_Controls\TextBlockControl\TextBlock_BrushColorChanging.xaml.cs">
       <DependentUpon>TextBlock_BrushColorChanging.xaml</DependentUpon>
